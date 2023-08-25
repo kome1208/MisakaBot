@@ -1,0 +1,36 @@
+{
+  "name": "misakabot",
+  "description": "bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "register": "node ./deploy.js",
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "@discord-player/extractor": "^4.4.1",
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/voice": "^0.16.0",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "axios": "^1.4.0",
+    "discord-player": "^6.6.2",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "play-dl": "^1.9.6",
+    "tweetnacl": "^1.0.3",
+    "youtube-sr": "^4.3.4"
+  },
+  "engines": {
+    "node": ">=16.9"
+  },
+  "repository": "git+https://github.com/kome1208/MisakaBot.git",
+  "keywords": [
+    "discord.js",
+    "d.js",
+    "discord",
+    "bot",
+    "template"
+  ],
+  "author": "kome1",
+  "license": "Apache-2.0"
+}
