@@ -11,6 +11,7 @@ module.exports = {
 	async execute(message) {
 		if (message.content.match(/\[\[([\w\s-]+)]]/)) {
             const matches = message.content.match(/\[\[(?<query>[\w\s-]+)]]/);
+            await message.channel.sendTyping();
             const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/misaka/tweaks/search?q=${encodeURIComponent(matches.groups.query)}&limit=25`);
             if (data.packages.length == 0) return message.reply({ content: 'No tweak found.'});
             const embeds = data.packages.slice(0,25).map((pkg) => {
