@@ -10,6 +10,10 @@ module.exports = {
 				console.error(error);
 				await interaction.reply({content: 'There was an error while executing this command!', ephemeral: true});
 			}
+		} else if (interaction.isMessageContextMenuCommand()) {
+			const context = client.contextMenus.get(interaction.commandName);
+			if (!context) return;
+			await context.run(interaction);
 		} else if (interaction.isAutocomplete()) {
 			const autocomplete = client.autocompletes.get(interaction.commandName);
 			await autocomplete.execute(interaction, client);

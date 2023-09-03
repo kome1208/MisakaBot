@@ -37,6 +37,13 @@ for (const file of autocompleteFiles) {
 	client.autocompletes.set(command.name, command);
 }
 
+client.contextMenus = new Collection();
+const contextFiles = fs.readdirSync("./interactions/contexts").filter((file) => file.endsWith(".js"));
+for (const file of contextFiles) {
+    const context = require(`./interactions/contexts/${file}`);
+    client.contextMenus.set(context.data.name, context);
+}
+
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
