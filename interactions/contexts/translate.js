@@ -26,8 +26,7 @@ module.exports = {
                 { label: 'Japanese', value: 'ja' },
                 { label: 'Korean', value: 'ko' },
                 { label: 'Russian', value: 'ru' },
-                { label: 'Spanish', value: 'es' },
-                { label: 'Vietnamese', value: 'vi'}
+                { label: 'Spanish', value: 'es' }
             ];
             const langs_menu = new ActionRowBuilder()
             .addComponents(
