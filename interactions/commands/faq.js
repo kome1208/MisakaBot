@@ -18,15 +18,17 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 		const { data } = await axios.get('https://raw.githubusercontent.com/shimajiron/Misaka_Network/main/FAQ.json');
-		const faq_id = interaction.options.getString('title');
+		const faq = data.find((element) => element.link === interaction.options.getString('title'));
+		const faq_ids = faq?.link?.split('/');
+		if (!faq || interaction.guildId !== faq_ids.at(-3)) return interaction.editReply({ content: 'invalid data' });
 		const user = interaction.options.getUser('target');
-		const faq_channel = await interaction.guild.channels.fetch('1136675951997104270');
-		const faq_thread = await faq_channel.threads.fetch(faq_id);
-		const faq_message = await faq_thread.messages.fetch(data[faq_id].content_id);
+		const faq_channel = await interaction.guild.channels.fetch(faq_ids.at(-2));
+		const faq_message = await faq_channel.messages.fetch(faq_ids.at(-1));
 		const embed = new EmbedBuilder()
-		.setTitle(faq_thread.name)
-		.setURL(faq_thread.url)
+		.setTitle(faq.title)
+		.setURL(faq.link)
 		.setDescription(faq_message.content || null)
+		.setImage(faq_message?.attachments?.filter((file) => file?.contentType?.startsWith('image'))?.first()?.url || null)
 		.setColor('Random');
 		await interaction.editReply({ content: user ? `${user}, please read this!` : null, embeds: [embed] });
     }
