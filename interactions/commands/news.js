@@ -155,17 +155,20 @@ module.exports = {
         const newsFile = latestTree.data.tree.find((file) => file.path === "News.json");
         const newsBlob = await octokit.rest.git.getBlob({owner, repo, file_sha: newsFile.sha});
         const newsContent = JSON.parse(Buffer.from(newsBlob.data.content, "base64").toString("utf-8"));
-        const addedTweaks = [];
+        const newTweaks = [];
         for (let i = 0; tweaks.length > i; i++) {
             const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/misaka/tweaks/${tweaks[i].value}`);
             if (data.count <= 0) return;
-            addedTweaks.unshift({
+            const addTweak = {
                 RepositoryURL: data.package.Repository.Link,
                 PackageID: data.package.PackageID
-            });
+            };
+            newTweaks.unshift(addTweak);
         }
-        
-        newsContent.Tweaks = addedTweaks.concat(newsContent.Tweaks).slice(0, 25);;
+        newsContent.Tweaks.forEach((tweak) => {
+            if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
+        });
+        newsContent.Tweaks = newTweaks.slice(0, 75)
         newsContent.Update = moment().format("YYYY/MM/DD");
         
         const createdBlob = await octokit.rest.git.createBlob({
@@ -204,8 +207,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
         .setTitle("Updated News")
-        .setURL("https://github.com/shimajiron/Misaka_Network/blob/main/News.json")
-        .setDescription(`Added: ${addedTweaks.map((tweak) => tweak.PackageID).join(", ")}`);
+        .setDescription("https://github.com/shimajiron/Misaka_Network/blob/main/News.json");
 
         await interaction.editReply({ embeds: [embed] });
     }
