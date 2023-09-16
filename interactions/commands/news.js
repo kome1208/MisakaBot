@@ -142,7 +142,7 @@ module.exports = {
             )
         ),
 	async execute(interaction) {
-        if (allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.' });
+        if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
 		await interaction.deferReply({ ephemeral: true });
         const octokit = new Octokit({ auth: process.env['GITHUB_TOKEN'] });
         const tweaks = interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).reverse();
