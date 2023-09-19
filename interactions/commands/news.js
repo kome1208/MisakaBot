@@ -165,7 +165,7 @@ module.exports = {
             if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
         });
         newsContent.Tweaks = newTweaks.slice(0, 75)
-        newsContent.Update = moment().tz().format('YYYY/MM/DD HH:mm');
+        newsContent.Update = moment.tz().format('YYYY/MM/DD HH:mm');
 
         await git.updateRef({
             file,
