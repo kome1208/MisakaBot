@@ -1,9 +1,8 @@
-require('dotenv').config();
+const { Git } = require('../../utils/git');
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const { Octokit } = require('octokit');
 const moment = require('moment');
 const { default: axios } = require('axios');
-const allowedUsers = ["783305816702844990", "921378081229393980", "795556607445696533", "850370781456367688"];
+const allowedUsers = ['783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -144,21 +143,18 @@ module.exports = {
 	async execute(interaction) {
         if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
 		await interaction.deferReply({ ephemeral: true });
-        const octokit = new Octokit({ auth: process.env['GITHUB_TOKEN'] });
+        const git = new Git({
+            owner: 'shimajiron',
+            repo: 'Misaka_Network',
+            branch: 'main'
+        });
         const tweaks = interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).reverse();
-        const owner = "shimajiron",
-              repo = "Misaka_Network",
-              branch = "main"
-        
-        const latestCommit = await octokit.rest.repos.getBranch({owner, repo, branch});
-        const latestTree = await octokit.rest.git.getTree({owner, repo, tree_sha: latestCommit.data.commit.sha});
-        const newsFile = latestTree.data.tree.find((file) => file.path === "News.json");
-        const newsBlob = await octokit.rest.git.getBlob({owner, repo, file_sha: newsFile.sha});
-        const newsContent = JSON.parse(Buffer.from(newsBlob.data.content, "base64").toString("utf-8"));
+        const file = await git.getFile('News.json');
+        const newsContent = JSON.parse((await git.getBlob(file.sha)));
         const newTweaks = [];
         for (let i = 0; tweaks.length > i; i++) {
             const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/misaka/tweaks/${tweaks[i].value}`);
-            if (data.count <= 0) return;
+            if (!data.count) return;
             const addTweak = {
                 RepositoryURL: data.package.Repository.Link,
                 PackageID: data.package.PackageID
@@ -169,45 +165,17 @@ module.exports = {
             if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
         });
         newsContent.Tweaks = newTweaks.slice(0, 75)
-        newsContent.Update = moment().format("YYYY/MM/DD");
-        
-        const createdBlob = await octokit.rest.git.createBlob({
-            owner,
-            repo,
-            content: Buffer.from(JSON.stringify(newsContent, null, 2), "utf-8").toString("base64"),
-            encoding: "base64"
-        });
-        
-        const createdTree = await octokit.rest.git.createTree({
-            owner,
-            repo,
-            tree: [{
-                type: newsFile.type,
-                path: newsFile.path,
-                mode: newsFile.mode,
-                sha: createdBlob.data.sha
-            }],
-            base_tree: latestCommit.data.commit.sha
-        });
-        
-        const createdCommit = await octokit.rest.git.createCommit({
-            owner,
-            repo,
-            message: "Update News.json (via API)",
-            tree: createdTree.data.sha,
-            parents: [latestCommit.data.commit.sha]
-        });
-        
-        await octokit.rest.git.updateRef({
-            owner,
-            repo,
-            ref: `heads/main`,
-            sha: createdCommit.data.sha
+        newsContent.Update = moment().format('YYYY/MM/DD');
+
+        await git.updateRef({
+            file,
+            content: JSON.stringify(newsContent, null, 2),
+            message: 'Update News.json (via API)'
         });
 
         const embed = new EmbedBuilder()
-        .setTitle("Updated News")
-        .setDescription("https://github.com/shimajiron/Misaka_Network/blob/main/News.json");
+        .setTitle('Updated News')
+        .setDescription('https://github.com/shimajiron/Misaka_Network/blob/main/News.json');
 
         await interaction.editReply({ embeds: [embed] });
     }

@@ -17,6 +17,9 @@ module.exports = {
 		} else if (interaction.isAutocomplete()) {
 			const autocomplete = client.autocompletes.get(interaction.commandName);
 			await autocomplete.execute(interaction, client);
+		} else if (interaction.isModalSubmit()) {
+			const modal = client.modals.get(interaction.customId);
+			await modal.execute(interaction, client);
 		}
 	}
 };

@@ -44,6 +44,13 @@ for (const file of contextFiles) {
     client.contextMenus.set(context.data.name, context);
 }
 
+client.modals = new Collection();
+const modalFiles = fs.readdirSync("./interactions/modals").filter((file) => file.endsWith(".js"));
+for (const file of modalFiles) {
+    const modal = require(`./interactions/modals/${file}`);
+    client.modals.set(modal.id, modal);
+}
+
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
