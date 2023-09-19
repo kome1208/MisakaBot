@@ -1,6 +1,6 @@
 const { Git } = require('../../utils/git');
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const { default: axios } = require('axios');
 const allowedUsers = ['783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
 
@@ -165,7 +165,7 @@ module.exports = {
             if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
         });
         newsContent.Tweaks = newTweaks.slice(0, 75)
-        newsContent.Update = moment().format('YYYY/MM/DD');
+        newsContent.Update = moment().tz().format('YYYY/MM/DD HH:mm');
 
         await git.updateRef({
             file,
