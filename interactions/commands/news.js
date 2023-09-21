@@ -144,7 +144,7 @@ module.exports = {
         if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
 		await interaction.deferReply({ ephemeral: true });
         const git = new Git({
-            owner: 'shimajiron',
+            owner: 'kome1208',
             repo: 'Misaka_Network',
             branch: 'main'
         });
@@ -153,14 +153,15 @@ module.exports = {
         const newsContent = JSON.parse((await git.getBlob(file.sha)));
         const newTweaks = [];
         for (let i = 0; tweaks.length > i; i++) {
-            const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/misaka/tweaks/${tweaks[i].value}`);
-            if (!data.count) return;
+            const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/${tweaks[i].value}`).catch(e => e);
+            if (res instanceof Error) break;
             const addTweak = {
-                RepositoryURL: data.package.Repository.Link,
-                PackageID: data.package.PackageID
+                RepositoryURL: res.data.tweak.Repository.Link,
+                PackageID: res.data.tweak.PackageID
             };
             newTweaks.unshift(addTweak);
         }
+        if (!newTweaks.length) return interaction.editReply({ content: "🤔" });
         newsContent.Tweaks.forEach((tweak) => {
             if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
         });

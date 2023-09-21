@@ -6,13 +6,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('tweak')
 		.setDescription('Search the misaka tweaks')
-		.addStringOption(option => option.setName('query').setDescription('Query of tweaks').setRequired(true)),
+		.addStringOption(option => option.setName('query').setDescription('Query of tweaks').setRequired(true).setMinLength(2)),
 	async execute(interaction) {
         await interaction.deferReply();
         const query = interaction.options.getString('query');
-        const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/misaka/tweaks/search?q=${encodeURIComponent(query)}&limit=25`);
-        if (data.packages.length == 0) return interaction.editReply({ content: 'No tweak found.'});
-        const embeds = data.packages.slice(0,25).map((pkg) => {
+        const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/search?q=${encodeURIComponent(query)}&limit=25`);
+        if (!data.tweaks.length) return interaction.editReply({ content: 'No tweak found.'});
+        const embeds = data.tweaks.slice(0, 25).map((pkg) => {
             return tweakEmbed(pkg);
         })
         const options = embeds.map((embed, i) => ({label:`${embed.data.title.slice(0, 99)}`, value:`${i}`}));
