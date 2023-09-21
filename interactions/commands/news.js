@@ -144,7 +144,7 @@ module.exports = {
         if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
 		await interaction.deferReply({ ephemeral: true });
         const git = new Git({
-            owner: 'kome1208',
+            owner: 'shimajiron',
             repo: 'Misaka_Network',
             branch: 'main'
         });
