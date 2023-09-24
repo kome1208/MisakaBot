@@ -11,8 +11,8 @@ module.exports = {
         .setDMPermission(false)
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addSubcommand(command =>
-            command.setName('add')
-            .setDescription('add tweaks to news')
+            command.setName('update')
+            .setDescription('update news')
             .addStringOption(option => 
                 option.setName('tweak1')
                 .setDescription('tweak')
@@ -144,28 +144,30 @@ module.exports = {
         if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
 		await interaction.deferReply({ ephemeral: true });
         const git = new Git({
-            owner: 'kome1208',
+            owner: 'shimajiron',
             repo: 'Misaka_Network',
             branch: 'main'
         });
-        const tweaks = interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).reverse();
         const file = await git.getFile('News.json');
         const newsContent = JSON.parse((await git.getBlob(file.sha)));
-        const newTweaks = [];
-        for (let i = 0; tweaks.length > i; i++) {
-            const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/${tweaks[i].value}`).catch(e => e);
-            if (res instanceof Error) break;
-            const addTweak = {
-                RepositoryURL: res.data.tweak.Repository.Link,
-                PackageID: res.data.tweak.PackageID
-            };
-            newTweaks.unshift(addTweak);
-        }
-        if (!newTweaks.length) return interaction.editReply({ content: "🤔" });
-        newsContent.Tweaks.forEach((tweak) => {
-            if (!newTweaks.find((t) => t.PackageID === tweak.PackageID)) newTweaks.push(tweak);
+        const tweaks = [
+            ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
+            ...newsContent.Tweaks.map((tweak) => tweak.PackageID)
+        ];
+        const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/${tweaks}`);
+        const availables = res.data.tweaks.map((tweak) => {
+            return {
+                RepositoryURL: tweak.Repository.Link,
+                PackageID: tweak.PackageID
+            }
         });
-        newsContent.Tweaks = newTweaks.slice(0, 75)
+        const newList = [];
+        for (const tweak of tweaks) {
+            const found = availables.find(t => t.PackageID == tweak);
+            if (found) newList.push(found);
+        }
+        if (!newList.length) return interaction.editReply({ content: "🤔" });
+        newsContent.Tweaks = newList.slice(0, 75)
         newsContent.Update = moment.tz().format('YYYY/MM/DD HH:mm');
 
         await git.updateRef({
