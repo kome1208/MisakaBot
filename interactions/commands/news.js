@@ -2,7 +2,7 @@ const { Git } = require('../../utils/git');
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const moment = require('moment-timezone');
 const { default: axios } = require('axios');
-const allowedUsers = ['783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
+const allowedUsers = ['1108416506716508190', '783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
 
 module.exports = {
 	data: new SlashCommandBuilder()

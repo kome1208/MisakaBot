@@ -47,7 +47,7 @@ module.exports = {
 			.setColor('Random');
 			await interaction.editReply({ content: user ? `${user}, please read this!` : null, embeds: [embed] });
 		} else if (interaction.options.getSubcommand() === 'add') {
-			const allowedUsers = ['783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
+			const allowedUsers = ['1108416506716508190', '783305816702844990', '921378081229393980', '795556607445696533', '850370781456367688'];
 			if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted', ephemeral: true });
 			const title_input = new TextInputBuilder()
 			.setCustomId('faq_title_input')
