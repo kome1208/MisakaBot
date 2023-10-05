@@ -161,11 +161,13 @@ module.exports = {
                 PackageID: tweak.PackageID
             }
         });
-        const newList = [];
-        for (const tweak of tweaks) {
-            const found = availables.find(t => t.PackageID == tweak);
-            if (found) newList.push(found);
-        }
+        const newList = tweaks.reduce((result, packageId) => {
+            const found = availables.find((tweak) => tweak.PackageID === packageId);
+            if (found && !result.some((tweak) => tweak.PackageID === packageId)) {
+                result.push(found);
+            }
+            return result;
+        }, []);
         if (!newList.length) return interaction.editReply({ content: "🤔" });
         newsContent.Tweaks = newList.slice(0, 75)
         newsContent.Update = moment.tz().format('YYYY/MM/DD HH:mm');
