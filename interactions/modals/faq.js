@@ -1,4 +1,4 @@
-const { ModalSubmitInteraction } = require('discord.js');
+const { ModalSubmitInteraction, EmbedBuilder } = require('discord.js');
 const { Git } = require('../../utils/git');
 
 module.exports = {
