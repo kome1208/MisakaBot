@@ -9,8 +9,7 @@ module.exports = {
 		.setName('news')
 		.setDescription('news')
         .setDMPermission(false)
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addSubcommand(command =>
+	.addSubcommand(command =>
             command.setName('update')
             .setDescription('update news')
             .addStringOption(option => 
