@@ -18,57 +18,100 @@ module.exports = {
         if (!message.content) return await interaction.editReply({ content: 'no message content' });
         else {
             const targetLangs = [
-                { label: 'Arabic', value: 'ar' },
-                { label: 'Chinese', value: 'zh' },
-                { label: 'English', value: 'en' },
-                { label: 'French', value: 'fr' },
-                { label: 'German', value: 'de' },
-                { label: 'Japanese', value: 'ja' },
-                { label: 'Korean', value: 'ko' },
-                { label: 'Russian', value: 'ru' },
-                { label: 'Spanish', value: 'es' }
+                { label: 'Arabic', value: 'ar', deepl: false },
+                { label: 'Chinese', value: 'zh', deepl: true },
+                { label: 'English', value: 'en', deepl: true },
+                { label: 'French', value: 'fr', deepl: true },
+                { label: 'German', value: 'de', deepl: true },
+                { label: 'Japanese', value: 'ja', deepl: true },
+                { label: 'Korean', value: 'ko', deepl: true },
+                { label: 'Portuguese', value: 'pt', deepl: true },
+                { label: 'Russian', value: 'ru', deepl: true },
+                { label: 'Spanish', value: 'es', deepl: true },
+                { label: 'Vietnamese', value: 'vi', deepl: false }
             ];
-            const langs_menu = new ActionRowBuilder()
-            .addComponents(
-                new StringSelectMenuBuilder()
-                .setCustomId('select_language')
-                .setPlaceholder('Languages')
-                .addOptions(targetLangs)
+
+            const engines = new ActionRowBuilder()
+            .setComponents(
+                new ButtonBuilder()
+                .setCustomId('translate_google')
+                .setLabel('Google')
+                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                .setCustomId('translate_deepl')
+                .setLabel('DeepL')
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(true)
             );
-            const select_lang = await interaction.editReply({ content: 'select a language', components: [ langs_menu ] });
-            const filter = ({ customId }) => (customId.startsWith('select_language'));
-            const collector = select_lang.createMessageComponentCollector({ filter, time: 300_000 });
-            collector.on('collect', async (i) => {
+
+            const select_engine = await interaction.followUp({ content: 'Select a translation engine (Recommended: Google)', components: [ engines ], ephemeral: true })
+            const engine_collector = select_engine.createMessageComponentCollector({
+                max: 1,
+                time: 300_000
+            });
+            engine_collector.on('collect', async (i) => {
                 await i.deferReply({ ephemeral: true });
-                try {
-                    const targetLang = i.values[0];
-                    const { data } = await axios.post("https://lt.liberal-online.net/translate",
-                    {
-                        q: message.content,
-                        source: 'auto',
-                        target: targetLang,
-                        format: 'text'
+                const selectedEngine = i.customId.endsWith('google') ? 'google' : 'deepl';
+                const langs_menu = new ActionRowBuilder()
+                .addComponents(
+                    new StringSelectMenuBuilder()
+                    .setCustomId('select_language')
+                    .setPlaceholder('click here')
+                    .addOptions(selectedEngine === 'google' ? targetLangs : targetLangs.filter((lang) => lang.deepl))
+                )
+                const select_lang = await i.editReply({ content: `Select a language` , components: [ langs_menu ] });
+                const lang_collector = select_lang.createMessageComponentCollector({
+                    max: 1,
+                    time: 300_000
+                });
+                lang_collector.on('collect', async (i2) => {
+                    const targetLang = i2.values[0];
+                    let translatedText;
+                    await i2.deferReply({ ephemeral: true });
+                    try {
+                        if (selectedEngine === 'google') {
+                            const { data } = await axios.get("http://translate.google.com/translate_a/single",
+                            {
+                                params: {
+                                    client: 'at',
+                                    dt: 't',
+                                    dj: '1',
+                                    sl: 'auto',
+                                    tl: targetLang,
+                                    q: message.content
+                                }
+                            }
+                            );
+                            translatedText = data.sentences[0].trans;
+                        } else if (selectedEngine === 'deepl') {
+                            const { data } = await axios.post("DEEPL X API URL",
+                            {
+                                text: message.content,
+                                source_lang: '',
+                                target_lang: targetLang,
+                            }
+                            );
+                            translatedText = data.data;
+                        }
+                        const embed = new EmbedBuilder()
+                        .setTitle(`Translation to ${targetLang}`)
+                        .setDescription(translatedText)
+                        .setColor('White')
+                        .setFooter({ text: `Powered by ${selectedEngine} translate` });
+                        const button = new ActionRowBuilder()
+                        .addComponents(
+                            new ButtonBuilder()
+                            .setLabel('Jump to message')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL(message.url)
+                        );
+                        await i2.editReply({ embeds: [ embed ], components: [ button ] });
+                    } catch (e) {
+                        console.error(e);
+                        await i2.editReply({ content: 'An error occured.' });
                     }
-                    );
-                    const embed = new EmbedBuilder()
-                    .setTitle(`Translation from ${data.detectedLanguage.language} to ${targetLang}`)
-                    .setDescription(data.translatedText)
-                    .setColor('White')
-                    .setFooter({ text: 'Powered by LibreTranslate' });
-                    const button = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                        .setLabel('Jump')
-                        .setStyle(ButtonStyle.Link)
-                        .setURL(message.url)
-                    );
-                    await i.editReply({ embeds: [ embed ], components: [ button ] });
-                } catch (err) {
-                    console.error(err);
-                    await i.editReply({ content: 'An error occured.' });
-                }
-            })
-            .on('end', async () => {});
+                });
+            });
         }
     }
 }
