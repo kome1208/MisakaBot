@@ -1,5 +1,6 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, MessageContextMenuCommandInteraction } = require('discord.js');
 const axios = require('axios');
+const fs = require('fs');
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
@@ -65,6 +66,9 @@ module.exports = {
                     time: 300_000
                 });
                 lang_collector.on('collect', async (i2) => {
+                    if (!fs.existsSync('TranslationCount.txt')) fs.writeFileSync('TranslationCount.txt', '0', 'utf8');
+                    const translationCount = fs.readFileSync('TranslationCount.txt', 'utf8');
+                    fs.writeFileSync('TranslationCount.txt', String(Number(translationCount) + 1), 'utf8');
                     const targetLang = i2.values[0];
                     let translatedText;
                     await i2.deferReply({ ephemeral: true });
