@@ -71,7 +71,7 @@ module.exports = {
                     fs.writeFileSync('TranslationCount.txt', String(Number(translationCount) + 1), 'utf8');
                     const targetLang = i2.values[0];
                     let translatedText;
-                    await i2.deferReply({ ephemeral: true });
+                    await i2.deferUpdate();
                     try {
                         if (selectedEngine === 'google') {
                             const { data } = await axios.get("http://translate.google.com/translate_a/single",
@@ -109,7 +109,7 @@ module.exports = {
                             .setStyle(ButtonStyle.Link)
                             .setURL(message.url)
                         );
-                        await i2.editReply({ embeds: [ embed ], components: [ button ] });
+                        await i2.editReply({ content: null, embeds: [ embed ], components: [ button ] });
                     } catch (e) {
                         console.error(e);
                         await i2.editReply({ content: 'An error occured.' });
