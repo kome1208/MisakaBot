@@ -6,7 +6,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('tweak')
 		.setDescription('Search the misaka tweaks')
-		.addStringOption(option => option.setName('query').setDescription('Query of tweaks').setRequired(true).setMinLength(2)),
+		.addStringOption(option => 
+            option.setName('query')
+            .setDescription('Query of tweaks')
+            .setRequired(true)
+            .setAutocomplete(true)
+            .setMinLength(2)
+        ),
 	async execute(interaction) {
         await interaction.deferReply();
         const query = interaction.options.getString('query');
