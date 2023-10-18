@@ -10,13 +10,6 @@ module.exports = {
             .setDescription('enter text')
             .setRequired(true)
         )
-        .addStringOption(option =>
-            option.setName('engine')
-            .setDescription('select a translation engine')
-            .addChoices(
-                { name: 'Google', value: 'google' }
-            )
-        )
         .addStringOption(option => 
             option.setName('target')
             .setDescription('target language')
@@ -32,6 +25,14 @@ module.exports = {
                 { name: 'Russian', value: 'ru' },
                 { name: 'Spanish', value: 'es' },
                 { name: 'Vietnamese', value: 'vi' }
+            )
+            .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('engine')
+            .setDescription('select a translation engine')
+            .addChoices(
+                { name: 'Google', value: 'google' }
             )
         )
         .addBooleanOption(option =>
