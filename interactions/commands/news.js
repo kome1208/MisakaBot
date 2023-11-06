@@ -147,11 +147,11 @@ module.exports = {
             repo: 'Misaka_Network',
             branch: 'main'
         });
-        const file = await git.getFile('News.json');
+        const file = await git.getFile('Server/News.json');
         const newsContent = JSON.parse((await git.getBlob(file.sha)));
         const tweaks = [
             ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
-            ...newsContent.Tweaks.map((tweak) => tweak.PackageID)
+            ...newsContent.NewRelease.map((tweak) => tweak.PackageID)
         ];
         const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/${tweaks}`);
         const availables = res.data.tweaks.map((tweak) => {
@@ -168,13 +168,13 @@ module.exports = {
             return result;
         }, []);
         if (!newList.length) return interaction.editReply({ content: "🤔" });
-        newsContent.Tweaks = newList.slice(0, 75)
-        newsContent.Update = moment.tz().format('YYYY/MM/DD HH:mm');
+        newsContent.NewRelease = newList.slice(0, 75)
+        newsContent.LastUpdate = moment.tz().format('YYYY/MM/DD HH:mm');
 
         await git.updateRef({
             file,
             content: JSON.stringify(newsContent, null, 2),
-            message: 'Update News.json (via API)'
+            message: 'Update Server/News.json (via API)'
         });
 
         const embed = new EmbedBuilder()
