@@ -148,7 +148,7 @@ module.exports = {
             branch: 'main'
         });
         const file = await git.getFile('Server/News.json');
-        const newsContent = JSON.parse((await git.getBlob(file.sha)));
+        const newsContent = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
         const tweaks = [
             ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
             ...newsContent.NewRelease.map((tweak) => tweak.PackageID)

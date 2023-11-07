@@ -10,16 +10,17 @@ module.exports = {
             this.branch = branch;
         }
         async getFile(path) {
-            const tree = await this.getTree();
-            return tree.data.tree.find((file) => file.path === path);
-        }
-        async getBlob(file_sha) {
-            const blob = await octokit.rest.git.getBlob({
+            const tree = await octokit.request('GET /repos/{owner}/{repo}/commits', {
+                owner: this.owner,
+                repo: this.repo
+            });
+            const res = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
                 owner: this.owner,
                 repo: this.repo,
-                file_sha
+                path,
+                ref: tree.data[0].sha
             });
-            return Buffer.from(blob.data.content, 'base64').toString('utf-8');
+            return res.data;
         }
         async getTree() {
             const branch = await this.getBranch();
@@ -37,12 +38,9 @@ module.exports = {
             });
         }
         async updateRef({ file, content, message }) {
-            const latestCommit = await this.getBranch();
-            const createdBlob = await octokit.rest.git.createBlob({
+            const latestCommit = await octokit.request('GET /repos/{owner}/{repo}/commits', {
                 owner: this.owner,
-                repo: this.repo,
-                content: Buffer.from(content, 'utf-8').toString('base64'),
-                encoding: 'base64'
+                repo: this.repo
             });
             const createdTree = await octokit.rest.git.createTree({
                 owner: this.owner,
@@ -50,17 +48,17 @@ module.exports = {
                 tree: [{
                     type: file.type,
                     path: file.path,
-                    mode: file.mode,
-                    sha: createdBlob.data.sha
+                    mode: '100644',
+                    content
                 }],
-                base_tree: latestCommit.data.commit.sha
+                base_tree: latestCommit.data[0].sha
             });
             const createdCommit = await octokit.rest.git.createCommit({
                 owner: this.owner,
                 repo: this.repo,
                 message,
                 tree: createdTree.data.sha,
-                parents: [latestCommit.data.commit.sha]
+                parents: [latestCommit.data[0].sha]
             });
     
             await octokit.rest.git.updateRef({
