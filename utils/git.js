@@ -22,21 +22,6 @@ module.exports = {
             });
             return res.data;
         }
-        async getTree() {
-            const branch = await this.getBranch();
-            return octokit.rest.git.getTree({
-                owner: this.owner,
-                repo: this.repo,
-                tree_sha: branch.data.commit.sha
-            });
-        }
-        async getBranch() {
-            return octokit.rest.repos.getBranch({
-                owner: this.owner,
-                repo: this.repo,
-                branch: this.branch
-            });
-        }
         async updateRef({ file, content, message }) {
             const latestCommit = await octokit.request('GET /repos/{owner}/{repo}/commits', {
                 owner: this.owner,

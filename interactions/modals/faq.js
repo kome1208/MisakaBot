@@ -15,7 +15,7 @@ module.exports = {
             branch: 'main'
         });
         const file = await git.getFile('FAQ.json');
-        const faq = JSON.parse((await git.getBlob(file.sha)));
+        const faq = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
         const title = interaction.fields.getTextInputValue('faq_title_input');
         const link = interaction.fields.getTextInputValue('faq_link_input');
         if (faq.find((element) => element.link === link)) return interaction.editReply({ content: 'Already exists' });
