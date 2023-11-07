@@ -179,7 +179,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
         .setTitle('Updated News')
-        .setDescription('https://github.com/shimajiron/Misaka_Network/blob/main/News.json');
+        .setDescription('https://github.com/shimajiron/Misaka_Network/blob/main/Server/News.json');
 
         await interaction.editReply({ embeds: [embed] });
     }
