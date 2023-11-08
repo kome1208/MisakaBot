@@ -15,7 +15,7 @@ module.exports = {
             { name:'Tweak Page', value:`[Open](https://straight-tamago.github.io/misaka/?repo=${packageData.repository.link}&tweak=${packageData.packageid})`, inline:true }
         )
         .setThumbnail(packageData.Icon || null)
-        .setImage(packageData?.Screenshot?.at(0) || null)
+        .setImage(packageData?.screenshots?.at(0) || null)
         .setColor('Random');
     }
 }
