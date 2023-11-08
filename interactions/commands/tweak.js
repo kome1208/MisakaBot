@@ -16,7 +16,7 @@ module.exports = {
 	async execute(interaction) {
         await interaction.deferReply();
         const query = interaction.options.getString('query');
-        const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/search?q=${encodeURIComponent(query)}&limit=25`);
+        const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/search?q=${encodeURIComponent(query)}&limit=25`);
         if (!data.tweaks.length) return interaction.editReply({ content: 'No tweak found.'});
         const embeds = data.tweaks.slice(0, 25).map((pkg) => {
             return tweakEmbed(pkg);

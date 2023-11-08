@@ -153,11 +153,11 @@ module.exports = {
             ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
             ...newsContent.NewRelease.map((tweak) => tweak.PackageID)
         ];
-        const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v1/tweaks/${tweaks}`);
+        const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/${tweaks}`);
         const availables = res.data.tweaks.map((tweak) => {
             return {
-                RepositoryURL: tweak.Repository.Link,
-                PackageID: tweak.PackageID
+                RepositoryURL: tweak.repository.link,
+                PackageID: tweak.packageid
             }
         });
         const newList = tweaks.reduce((result, packageId) => {
