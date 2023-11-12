@@ -9,178 +9,88 @@ module.exports = {
 		.setName('news')
 		.setDescription('news')
         .setDMPermission(false)
-	.addSubcommand(command =>
+	    .addSubcommand(command => {
             command.setName('update')
             .setDescription('update news')
-            .addStringOption(option => 
-                option.setName('tweak1')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-                .setRequired(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak2')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak3')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak4')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak5')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak6')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak7')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak8')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak9')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak10')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak11')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak12')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak13')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak14')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak15')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak16')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak17')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak18')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak19')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak20')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak21')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak22')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak23')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak24')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
-            .addStringOption(option => 
-                option.setName('tweak25')
-                .setDescription('tweak')
-                .setAutocomplete(true)
-            )
+            for (let i = 1; i <= 25; i++) {
+                command.addStringOption(option =>
+                    option.setName('tweak' + i)
+                    .setDescription('tweak')
+                    .setAutocomplete(true)
+                    .setRequired(i == 1 ? true : false)
+                );
+            }
+            return command;
+        })
+        .addSubcommand(command =>
+            command.setName('view')
+            .setDescription('view news')
         ),
 	async execute(interaction) {
-        if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
-		await interaction.deferReply({ ephemeral: true });
-        const git = new Git({
-            owner: 'shimajiron',
-            repo: 'Misaka_Network',
-            branch: 'main'
-        });
-        const file = await git.getFile('Server/News.json');
-        const newsContent = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
-        const tweaks = [
-            ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
-            ...newsContent.NewRelease.map((tweak) => tweak.PackageID)
-        ];
-        const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/${tweaks}`);
-        const availables = res.data.tweaks.map((tweak) => {
-            return {
-                RepositoryURL: tweak.repository.link,
-                PackageID: tweak.packageid
+        if (interaction.options.getSubcommand() === 'update') {
+            if (!allowedUsers.includes(interaction.user.id)) return interaction.reply({ content: 'This operation is not permitted.', ephemeral: true });
+            await interaction.deferReply({ ephemeral: true });
+            const git = new Git({
+                owner: 'shimajiron',
+                repo: 'Misaka_Network',
+                branch: 'main'
+            });
+            const file = await git.getFile('Server/News.json');
+            const newsContent = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
+            const tweaks = [
+                ...interaction.options.data[0].options.filter((option) => option.name.startsWith('tweak')).map((tweak) => tweak.value),
+                ...newsContent.NewRelease.map((tweak) => tweak.PackageID)
+            ];
+            const res = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/${tweaks}`);
+            const availables = res.data.tweaks.map((tweak) => {
+                return {
+                    RepositoryURL: tweak.repository.link,
+                    PackageID: tweak.packageid
+                }
+            });
+            const newList = tweaks.reduce((result, packageId) => {
+                const found = availables.find((tweak) => tweak.PackageID === packageId);
+                if (found && !result.some((tweak) => tweak.PackageID === packageId)) {
+                    result.push(found);
+                }
+                return result;
+            }, []);
+            if (!newList.length) return interaction.editReply({ content: "🤔" });
+            newsContent.NewRelease = newList.slice(0, 75)
+            newsContent.LastUpdate = moment.tz().format('YYYY/MM/DD HH:mm');
+    
+            await git.updateRef({
+                file,
+                content: JSON.stringify(newsContent, null, 2),
+                message: 'Update Server/News.json (via API)'
+            });
+    
+            const embed = new EmbedBuilder()
+            .setTitle('Updated News')
+            .setDescription('https://github.com/shimajiron/Misaka_Network/blob/main/Server/News.json');
+    
+            await interaction.editReply({ embeds: [embed] });
+        } else if (interaction.options.getSubcommand() === 'view') {
+            await interaction.deferReply();
+            try {
+                const { data: news } = await axios.get('https://raw.githubusercontent.com/shimajiron/Misaka_Network/main/Server/News.json'); 
+                const { data: tweaks } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/${news.NewRelease.slice(0, 10).map(x => x.PackageID)}`);
+                const list = news.NewRelease.reduce((result, tweak) => {
+                    const found = tweaks.tweaks.slice(0, 10).find((t) => t.packageid === tweak.PackageID);
+                    if (found && !result.some((t) => t.packageid === tweak.PackageID)) {
+                        result.push(`[${found.name}](https://straight-tamago.github.io/misaka/?repo=${found.repository.link}&tweak=${found.packageid})`);
+                    }
+                    return result;
+                }, []);
+                const embed = new EmbedBuilder()
+                .setTitle('News')
+                .setURL('https://raw.githubusercontent.com/shimajiron/Misaka_Network/main/Server/News.json')
+                .setDescription(list.join("\n"))
+                .setFooter({ text: 'Last Update: ' + news.LastUpdate });
+                await interaction.editReply({ embeds: [ embed ] });
+            } catch (err) {
+                console.error(err);
             }
-        });
-        const newList = tweaks.reduce((result, packageId) => {
-            const found = availables.find((tweak) => tweak.PackageID === packageId);
-            if (found && !result.some((tweak) => tweak.PackageID === packageId)) {
-                result.push(found);
-            }
-            return result;
-        }, []);
-        if (!newList.length) return interaction.editReply({ content: "🤔" });
-        newsContent.NewRelease = newList.slice(0, 75)
-        newsContent.LastUpdate = moment.tz().format('YYYY/MM/DD HH:mm');
-
-        await git.updateRef({
-            file,
-            content: JSON.stringify(newsContent, null, 2),
-            message: 'Update Server/News.json (via API)'
-        });
-
-        const embed = new EmbedBuilder()
-        .setTitle('Updated News')
-        .setDescription('https://github.com/shimajiron/Misaka_Network/blob/main/Server/News.json');
-
-        await interaction.editReply({ embeds: [embed] });
+        }
     }
 }
