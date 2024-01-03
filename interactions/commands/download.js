@@ -1,14 +1,19 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
-const moment = require('moment-timezone');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('download')
-		.setDescription('Search the misaka tweaks'),
+		.setDescription('Get the latest release of misaka'),
 	async execute(interaction) {
         await interaction.deferReply();
-        const { data } = await axios.get('https://api.github.com/repos/straight-tamago/misaka/releases/latest');
+        const { data } = await axios.get('https://api.github.com/repos/straight-tamago/misaka/releases/latest', {
+            headers: {
+                "Accept": "application/vnd.github+json",
+                "Authorization": "Bearer " + process.env['GITHUB_TOKEN'],
+                "X-GitHub-Api-Version": "2022-11-28"
+            }
+        });
         const embed = new EmbedBuilder()
         .setTitle(data.name)
         .setURL(data.html_url)
