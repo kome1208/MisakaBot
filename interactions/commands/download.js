@@ -22,13 +22,15 @@ module.exports = {
                 }
             });
             const embed = new EmbedBuilder()
-            .setTitle(data.name)
+            .setTitle(data.name || data.tag_name)
             .setURL(data.html_url)
-            .setDescription(data.body)
+            .setDescription(data.body || null)
             .addFields(
                 { name: "Files", value: data.assets.map((file) => `[${file.name}](${file.browser_download_url})`).join("\n")}
             )
-            .setTimestamp(new Date(data.published_at));
+            .setColor(data.prerelease ? 'Orange' : 'Green')
+            .setTimestamp(new Date(data.published_at))
+            .setFooter({ text: data.prerelease ? 'Pre-release' : "Stable" });
             await interaction.editReply({ embeds: [embed] });
         } catch (err) {
             console.error(err);
