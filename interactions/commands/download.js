@@ -5,15 +5,19 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('download')
 		.setDescription('Get the release of misaka')
-        .addBooleanOption(option =>
-            option.setName('tvos')
-            .setDescription('misaka for tvOS')
+        .addStringOption(option =>
+            option.setName('platform')
+            .setDescription('choose a platform.(default:ios)')
+            .setChoices(
+                { name: 'iOS', value: 'ios' },
+                { name: 'tvOS', value: 'tvos' },
+            )
         ),
 	async execute(interaction) {
         await interaction.deferReply();
-        const isTVOS = interaction.options.getBoolean('tvos'); 
+        const platform = interaction.options.getString('platform') || 'ios'; 
         try {
-            const { data } = await axios.get(`https://api.github.com/repos/straight-tamago/misaka${isTVOS ? "-tvOS" : ""}/releases`, {
+            const { data } = await axios.get(`https://api.github.com/repos/straight-tamago/misaka${platform === "ios" ? "" : "-"+platform}/releases`, {
                 headers: {
                     "Accept": "application/vnd.github+json",
                     "Authorization": "Bearer " + process.env['GITHUB_TOKEN'],

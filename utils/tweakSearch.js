@@ -4,7 +4,7 @@ const { tweakEmbed } = require('./embedGenerator.js');
 
 module.exports = {
     run: async (message) => {
-        const matches = message.content.match(/\[\[(?<query>[\w\s-]+)]]/);
+        const matches = message.content.match(/\[\[(?<query>[\w-._+ぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠 ]+)]]/);
         if (matches.groups.query.length < 2) return;
         await message.channel.sendTyping();
         const { data } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/search?q=${encodeURIComponent(matches.groups.query)}&limit=25`);

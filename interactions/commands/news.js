@@ -75,17 +75,10 @@ module.exports = {
             try {
                 const { data: news } = await axios.get('https://raw.githubusercontent.com/shimajiron/Misaka_Network/main/Server/News.json'); 
                 const { data: tweaks } = await axios.get(`https://misaka-search-ydkr.koyeb.app/api/v2/tweaks/${news.NewRelease.slice(0, 10).map(x => x.PackageID)}`);
-                const list = news.NewRelease.reduce((result, tweak) => {
-                    const found = tweaks.tweaks.slice(0, 10).find((t) => t.packageid === tweak.PackageID);
-                    if (found && !result.some((t) => t.packageid === tweak.PackageID)) {
-                        result.push(`[${found.name}](https://straight-tamago.github.io/misaka/?repo=${found.repository.link}&tweak=${found.packageid})`);
-                    }
-                    return result;
-                }, []);
                 const embed = new EmbedBuilder()
                 .setTitle('News')
                 .setURL('https://raw.githubusercontent.com/shimajiron/Misaka_Network/main/Server/News.json')
-                .setDescription(list.join("\n"))
+                .setDescription(tweaks.tweaks.join("\n"))
                 .setFooter({ text: 'Last Update: ' + news.LastUpdate });
                 await interaction.editReply({ embeds: [ embed ] });
             } catch (err) {
