@@ -11,6 +11,15 @@ module.exports = {
         let result;
 		if (message.content.match(/\[\[([\w-._+ぁ-んァ-ヶｱ-ﾝﾞﾟ一-龠 ]+)]]/)) {
             tweakSearch.run(message);
+        } else if (message.content.match(/\[(.*?)\]\((https?:\/\/(?!(?:www\.|cdn\.)?(?:discord\.com|discordapp\.com))[^\s]+)\)/)) {
+            if (message.member.roles.cache.hasAll(['1156843198954618958', '1156843198954618956'])) return;
+            const embed = new EmbedBuilder()
+            .setDescription(`**${message.member.displayName}** has been timed out for 1h\n**Reason**: Sent a message containing a hyperlink`)
+            .setFooter(`${message.member.user.username} | ${message.member.id}`);
+
+            await message.member.timeout(3600000);
+            await message.delete();
+            await message.channel.send({ embeds: [ embed ] });
         }
         const MSGLINK_PATTERN = /http(?:s)?:\/\/(?:.*)?discord(?:app)?.com\/channels\/(?<guildId>\d+)\/(?<channelId>\d+)\/(?<messageId>\d+)/g;
         while ((result = MSGLINK_PATTERN.exec(message.content)) !== null) {
